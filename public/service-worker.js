@@ -1,4 +1,3 @@
-console.log('Hello from service worker.')
 const CACHE_NAME = "Static Cache";
 const DATA_CACHE_NAME = "Data Cache";
 
@@ -13,19 +12,20 @@ const FILES_TO_CACHE = [
 ];
 
 // install step that caches assets
-self.addEventListener("install", (evt) => {
-    evt.waitUntil(
-        caches.open(DATA_CACHE_NAME).then(cache => {
-            console.log("Data pre-cached successfully!");
-            return cache.add('/api/transaction')
-        })
-    );
+self.addEventListener("install", function (evt) {
     evt.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
             console.log("Files pre-cached successfully!");
             return cache.addAll(FILES_TO_CACHE)
         })
     );
+    evt.waitUntil(
+        caches.open(DATA_CACHE_NAME).then(cache => {
+            console.log("Data pre-cached successfully!");
+            return cache.add('/api/transaction')
+        })
+    );
+
     self.skipWaiting();
 });
 
@@ -62,6 +62,7 @@ self.addEventListener("fetch", (evt) => {
                         return response;
                     })
                     .catch(err => {
+                        console.log(err)
                         return cache.match(evt.request);
                     });
             })
